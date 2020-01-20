@@ -16,8 +16,9 @@ $router->get('/', function () use ($router) {
 });
 
 $router->group(['prefix' => 'tests'], function () use ($router) {
-    $router->get('data', ['uses' => 'TestController@ambildata']);
+    $router->post('datausers', ['uses' => 'TestController@ambildata']);
     $router->post('update', ['uses' => 'TestController@upload']);
-    $router->get('/user/avatar/', 'TestController@get_avatar');
-    $router->get('read', ['uses' => 'TestController@readData']);
+    $router->post('update2', ['uses' => 'TestController@upload2']);
+    $router->post('update3', ['uses' => 'TestController@upload3']);
+    $router->get('user/avatar/{name}', 'TestController@get_avatar');
 });
