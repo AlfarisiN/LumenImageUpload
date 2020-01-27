@@ -16,6 +16,7 @@ $router->get('/', function () use ($router) {
 });
 
 $router->group(['prefix' => 'tests'], function () use ($router) {
+    $router->post('upload', ['uses' => 'FileController@store']);
     $router->post('datausers', ['uses' => 'TestController@ambildata']);
     $router->post('update', ['uses' => 'TestController@upload']);
     $router->post('update2', ['uses' => 'TestController@upload2']);

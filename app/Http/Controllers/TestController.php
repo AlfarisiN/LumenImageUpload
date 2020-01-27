@@ -6,11 +6,15 @@ use App\DataUser;
 use Illuminate\Http\Request;
 use Image;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
+use Hashids\Hashids;
+use Illuminate\Support\Facades\Validator;
+use Intervention\Image\ImageManager;
 
 class TestController extends Controller
 {
     public function ambildata(Request $request){
-        $id = $request->input('id'); 
+        $id = $request->input('id');
         $results = DataUser::select('id', 'name', 'image', 'mail', 'imagename')
         ->where('id', $id)
         ->get();
@@ -23,41 +27,34 @@ class TestController extends Controller
         $id = $request->input('id');
         $name = $request->input('name');
         $mail = $request->input('mail');
-        $avatar = Str::random(5);
-        $avatarr = Str::random(5);
-        //$request->file('image');
-        $image = $request->file('image')->move(storage_path('avatar'), $avatar);
-        $imagee = $request->file('imagee')->move(storage_path('avatar'), $avatarr);
+        $image = $request->file(['image']);
+        foreach ($image as $img){
+            $avatar = Str::random(5);
+            $file = $img->move(storage_path('avatar'), $avatar . '.'.$img->getClientOriginalExtension());
+            $result = DataUser::where('id', $id)->first();
+            if($result) {
+                $current_path_avatar = storage_path('avatar') . '/' . $img;
+                if(file_exists($current_path_avatar)){
+                    unlink($current_path_avatar);
+                }
+                $result->image = $file;
+                $result->imagename = $avatar.'.'.$img->getClientOriginalExtension();
+                $result->name = $name;
+                $result->mail = $mail;
+                $result->save();
+            }
+            else{
+                $result = new DataUser;
+                $result->image = $file;
+                $result->imagename = $avatar.'.'.$img->getClientOriginalExtension();
+                $result->name = $name;
+                $result->mail = $mail;
+                $result->save();
+            }
+        }
 
-        $result = DataUser::where('id', $id)->first();
-        if($result) {
-            $current_path_avatar = storage_path('avatar') . '/' . $image;
-            if(file_exists($current_path_avatar)){
-                unlink($current_path_avatar);
-            }
-            $current_path_avatarr = storage_path('avatar') . '/' . $imagee;
-            if(file_exists($current_path_avatarr)){
-                unlink($current_path_avatarr);
-            }
-            $result->image = $image;
-            $result->imagee = $imagee;
-            $result->imagename = $avatar;
-            $result->name = $name;
-            $result->mail = $mail;
-            $result->save();
-        }
-        else{
-            $result = new DataUser;
-            $result->image = $image;
-            $result->imagee = $imagee;
-            $result->imagename = $avatar;
-            $result->name = $name;
-            $result->mail = $mail;
-            $result->save();
-        }
         $res['success'] = true;
         $res['message'] = "Success update user profile.";
-        $res['data'] = $result;
         return $res;
     }
 
@@ -82,7 +79,7 @@ class TestController extends Controller
         $res['message'] = "Success update user profile.";
         $res['data'] = $datauser;
         return $res;
-        
+
     }
 
     public function upload3(Request $request){
@@ -124,7 +121,7 @@ class TestController extends Controller
         $res['message'] = "Success update user profile.";
         $res['data'] = $user_profile;
         return $res;
-        
+
     }
 
     public function get_avatar($name)
@@ -136,7 +133,7 @@ class TestController extends Controller
         }
         $res['success'] = false;
         $res['message'] = "Avatar not found";
-          
+
         return $res;
       }
 }
