@@ -38,7 +38,7 @@ class TestController extends Controller
                     unlink($current_path_avatar);
                 }
                 $result->image = $file;
-                $result->imagename = $avatar.'.'.$img->getClientOriginalExtension();
+                $result->imagename = ('avatar/').$avatar.'.'.$img->getClientOriginalExtension();
                 $result->name = $name;
                 $result->mail = $mail;
                 $result->save();
@@ -46,7 +46,7 @@ class TestController extends Controller
             else{
                 $result = new DataUser;
                 $result->image = $file;
-                $result->imagename = $avatar.'.'.$img->getClientOriginalExtension();
+                $result->imagename = ('avatar/').$avatar.'.'.$img->getClientOriginalExtension();
                 $result->name = $name;
                 $result->mail = $mail;
                 $result->save();
@@ -55,6 +55,7 @@ class TestController extends Controller
 
         $res['success'] = true;
         $res['message'] = "Success update user profile.";
+        $res['data'] = $result;
         return $res;
     }
 
