@@ -55,7 +55,6 @@ class TestController extends Controller
 
         $res['success'] = true;
         $res['message'] = "Success update user profile.";
-        $res['data'] = $result;
         return $res;
     }
 
