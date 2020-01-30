@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\File;
 use Hashids\Hashids;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManager;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class TestController extends Controller
 {
@@ -24,37 +25,72 @@ class TestController extends Controller
     }
 
     public function upload(Request $request){
-        $id = $request->input('id');
+        $id_image = $request->input('id_image');
         $name = $request->input('name');
         $mail = $request->input('mail');
         $image = $request->file(['image']);
-        foreach ($image as $img){
-            $avatar = Str::random(5);
-            $file = $img->move(storage_path('avatar'), $avatar . '.'.$img->getClientOriginalExtension());
-            $result = DataUser::where('id', $id)->first();
-            if($result) {
-                $current_path_avatar = storage_path('avatar') . '/' . $img;
-                if(file_exists($current_path_avatar)){
-                    unlink($current_path_avatar);
-                }
-                $result->image = $file;
-                $result->imagename = ('avatar/').$avatar.'.'.$img->getClientOriginalExtension();
-                $result->name = $name;
-                $result->mail = $mail;
-                $result->save();
-            }
-            else{
+        $querycek = DataUser::where('id_image', $id_image)->first();
+        if ($querycek){
+            DataUser::where('id_image', $id_image)->delete();
+            foreach ($image as $img){
+                $avatar = Str::random(5);
+                $file = $img->move(storage_path('avatar'), $avatar . '.'.$img->getClientOriginalExtension());
                 $result = new DataUser;
                 $result->image = $file;
                 $result->imagename = ('avatar/').$avatar.'.'.$img->getClientOriginalExtension();
                 $result->name = $name;
                 $result->mail = $mail;
+                $result->id_image = $id_image;
+                $result->save();
+            }
+
+        }else {
+            foreach ($image as $img) {
+                $avatar = Str::random(5);
+                $file = $img->move(storage_path('avatar'), $avatar . '.' . $img->getClientOriginalExtension());
+                $result = new DataUser;
+                $result->image = $file;
+                $result->imagename = ('avatar/') . $avatar . '.' . $img->getClientOriginalExtension();
+                $result->name = $name;
+                $result->mail = $mail;
+                $result->id_image = $id_image;
                 $result->save();
             }
         }
+//        foreach ($image as $img){
+//            $avatar = Str::random(5);
+//            $file = $img->move(storage_path('avatar'), $avatar . '.'.$img->getClientOriginalExtension());
+////            $result = DataUser::where('id_image', $id_image)->first();
+//            if($result){
+////                var_dump("a");
+////                die();
+//                $current_path_avatar = storage_path('avatar') . '/' . $img;
+//                if(file_exists($current_path_avatar)){
+//                    unlink($current_path_avatar);
+//                }
+//                $result->image = $file;
+//                $result->imagename = ('avatar/').$avatar.'.'.$img->getClientOriginalExtension();
+//                $result->name = $name;
+//                $result->mail = $mail;
+//                $result->id_image = $id_image;
+//                $result->save();
+//            }
+//            else{
+////                var_dump("b");
+////                die();
+//                $result = new DataUser;
+//                $result->image = $file;
+//                $result->imagename = ('avatar/').$avatar.'.'.$img->getClientOriginalExtension();
+//                $result->name = $name;
+//                $result->mail = $mail;
+//                $result->id_image = $id_image;
+//                $result->save();
+//            }
+//        }
 
         $res['success'] = true;
         $res['message'] = "Success update user profile.";
+//        $res['data'] = $result;
         return $res;
     }
 
