@@ -14,6 +14,8 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 class TestController extends Controller
 {
+
+
     public function ambildata(Request $request){
         $id = $request->input('id');
         $results = DataUser::select('id', 'name', 'image', 'mail', 'imagename')
@@ -34,10 +36,10 @@ class TestController extends Controller
             DataUser::where('id_image', $id_image)->delete();
             foreach ($image as $img){
                 $avatar = Str::random(5);
-                $file = $img->move(storage_path('avatar'), $avatar . '.'.$img->getClientOriginalExtension());
+                $file = $img->move(storage_path('avatar'), $avatar);
                 $result = new DataUser;
                 $result->image = $file;
-                $result->imagename = ('avatar/').$avatar.'.'.$img->getClientOriginalExtension();
+                $result->imagename = ('avatar/').$avatar;
                 $result->name = $name;
                 $result->mail = $mail;
                 $result->id_image = $id_image;
@@ -47,10 +49,10 @@ class TestController extends Controller
         }else {
             foreach ($image as $img) {
                 $avatar = Str::random(5);
-                $file = $img->move(storage_path('avatar'), $avatar . '.' . $img->getClientOriginalExtension());
+                $file = $img->move(storage_path('avatar'), $avatar);
                 $result = new DataUser;
                 $result->image = $file;
-                $result->imagename = ('avatar/') . $avatar . '.' . $img->getClientOriginalExtension();
+                $result->imagename = ('avatar/') . $avatar;
                 $result->name = $name;
                 $result->mail = $mail;
                 $result->id_image = $id_image;
@@ -70,7 +72,7 @@ class TestController extends Controller
             $file = file_get_contents($avatar_path);
             return response($file, 200)->header('Content-Type', 'image/jpeg');
         }
-        $res['success'] = false;
+        $res['status'] = false;
         $res['message'] = "Avatar not found";
 
         return $res;

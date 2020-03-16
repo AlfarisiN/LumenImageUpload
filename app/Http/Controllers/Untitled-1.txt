@@ -1,0 +1,54 @@
+public function upload3(Request $request){
+        $this->validate($request, array(
+            'id' => 'required|integer',
+            'name' => 'required|string',
+            'mail' => 'required|string',
+            'image' => 'required|image',
+        ));
+        $id = $request->input('id');
+        $name = $request->input('name');
+        $mail = $request->input('mail');
+        $avatar = Str::random(5);
+        //$request->file('image');
+        $image = $request->file('image')->move(storage_path('avatar'), $avatar);
+
+        $user_profile = DataUser::where('id', $id)->first();
+        if ($user_profile) {
+            /*$current_avatar_path = storage_path('avatar') . '/' . $user_profile->avatar;
+            if (file_exists($current_avatar_path)) {
+                unlink($current_avatar_path);
+            }*/
+            $user_profile->id = $request->id;
+            $user_profile->image = $image;
+            $user_profile->name = $request->name;
+            $user_profile->mail = $request->mail;
+            $user_profile->save();
+
+            /*}else{
+            $user_profile = new UserProfile;
+            $user_profile->id = $request->id;
+            $user_profile->avatar = $avatar;
+            $user_profile->name = $request->name;
+            $user_profile->mail = $request->mail;
+            $user_profile->save();*/
+
+        }
+        $res['success'] = true;
+        $res['message'] = "Success update user profile.";
+        $res['data'] = $user_profile;
+        return $res;
+        
+    }
+
+    public function get_avatar($name)
+    {
+        $avatar_path = storage_path('avatar') . '/' . $name;
+        if (file_exists($avatar_path)) {
+            $file = file_get_contents($avatar_path);
+            return response($file, 200)->header('Content-Type', 'image/jpeg');
+        }
+        $res['success'] = false;
+        $res['message'] = "Avatar not found";
+          
+        return $res;
+      }
